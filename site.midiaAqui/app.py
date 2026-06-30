@@ -8,6 +8,7 @@ st.title("⬇️ Downloader Pro")
 
 link = st.text_input("Cole o link do vídeo aqui:")
 
+# Inicializa estados
 if 'preparado' not in st.session_state: st.session_state.preparado = False
 if 'anuncio_visto' not in st.session_state: st.session_state.anuncio_visto = False
 
@@ -21,9 +22,9 @@ if st.session_state.preparado and not st.session_state.anuncio_visto:
     st.subheader("Escolha a qualidade:")
     qualidade = st.selectbox("Opções:", ["Qualidade Média (360p)", "Qualidade Alta (720p)", "Apenas Áudio (MP3)"])
     
-    st.warning("⚠️ Você precisa clicar no banner abaixo para liberar o download.")
+    st.warning("⚠️ Clique no banner abaixo para liberar o download.")
     
-    # Anúncio como link clicável para evitar redirecionamento forçado
+    # Anúncio clicável
     st.markdown("""
     <a href="https://pl30146977.effectivecpmnetwork.com/68/ef/ed/68efedae0214a457f49cd05115af4be8.js" target="_blank">
         <div style="background-color: #ff4b4b; color: white; padding: 20px; text-align: center; border-radius: 10px; cursor: pointer;">
@@ -48,17 +49,20 @@ if st.session_state.anuncio_visto:
                 
                 q = st.session_state.qualidade_escolhida
                 
-                # Mapeamento de formatos sem FFmpeg
+                # Formatos configurados para não precisar de FFmpeg e evitar erro 403
                 if "MP3" in q:
                     fmt = 'bestaudio/best'
                 elif "Alta" in q:
                     fmt = 'best[height<=720][ext=mp4]/best[ext=mp4]'
-                else: # Média
+                else:
                     fmt = 'best[height<=360][ext=mp4]/best[ext=mp4]'
                 
                 ydl_opts = {
                     'outtmpl': f'{pasta_temp}/%(title)s.%(ext)s',
                     'format': fmt,
+                    'user_agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+                    'nocheckcertificate': True,
+                    'quiet': True
                 }
                 
                 with yt_dlp.YoutubeDL(ydl_opts) as ydl:
@@ -68,6 +72,4 @@ if st.session_state.anuncio_visto:
                         arquivo = arquivo.replace(".webm", ".mp3").replace(".m4a", ".mp3")
                 
                 with open(arquivo, "rb") as f:
-                    st.download_button("Clique aqui para salvar o arquivo", data=f, file_name=os.path.basename(arquivo))
-        except Exception as e:
-            st.error(f"Erro no download: {e}. Tente outro link ou qualidade.")
+                    st.download_button("Clique aqui para salvar o arquivo", data=f, file_name=os.
